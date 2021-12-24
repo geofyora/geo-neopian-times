@@ -8,7 +8,7 @@ import java.io.InputStream
 
 class EntryListParser : Parser {
 
-    val NEOPETS_URL = "https://www.neopets.com/";
+    val NT_URL = "http://www.neopets.com/ntimes/";
 
     override fun parse(inputStream: InputStream): ArrayList<NTEntry> {
         val entryList = arrayListOf<NTEntry>()
@@ -16,7 +16,7 @@ class EntryListParser : Parser {
         if (inputStream == null) {
             return entryList
         }
-        val doc = Jsoup.parse(inputStream, Charsets.UTF_8.displayName(), NEOPETS_URL)
+        val doc = Jsoup.parse(inputStream, Charsets.UTF_8.displayName(), NT_URL)
         val content = doc.getElementsByClass("content")
 
         if (content.size > 0) {
@@ -38,7 +38,7 @@ class EntryListParser : Parser {
         val title = bolds[0].text()
         val summary = entryElement.text()
         val anchors = entryElement.getElementsByTag("a")
-        val contentPage = Jsoup.connect(anchors[0].attr("href")).get()
+        val contentPage = Jsoup.connect(NT_URL + anchors[0].attr("href")).get()
         val contents = contentPage.getElementsByClass("content").text()
         val primaryAuthorElement = anchors.filter { a -> a.attr("href") != null && a.attr("href").contains("randomfriend")}[0]
         val ntEntryBuilder : NTEntry.NTEntryBuilder = NTEntry.NTEntryBuilder.createBuilder()
