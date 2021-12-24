@@ -34,7 +34,7 @@ public class ArticleController {
 
             final URL url = new URL("http://www.neopets.com/ntimes/index.phtml?section=articles&week=" + issue);
             httpcon = (HttpURLConnection) url.openConnection();
-            httpcon.addRequestProperty("User-Agent", "Mozilla/4.0");
+            httpcon.addRequestProperty("User-Agent", "Mozilla/5.0");
 
             try(final InputStream inputStream = httpcon.getInputStream()){
                 if (inputStream == null) {
