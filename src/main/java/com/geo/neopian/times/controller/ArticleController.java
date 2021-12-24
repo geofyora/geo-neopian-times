@@ -29,20 +29,27 @@ public class ArticleController {
     public ResponseEntity<List<NTEntry>> getArticlesByIssue(@PathVariable String issue) {
 
         final EntryListParser entryListParser = new EntryListParser();
+        HttpURLConnection httpcon = null;
         try {
 
             final URL url = new URL("http://www.neopets.com/ntimes/index.phtml?section=articles&week=" + issue);
-            final HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+            httpcon = (HttpURLConnection) url.openConnection();
             httpcon.addRequestProperty("User-Agent", "Mozilla/4.0");
-            final InputStream inputStream = httpcon.getInputStream();
-            if (inputStream == null) {
+
+            try(final InputStream inputStream = httpcon.getInputStream()){
+                if (inputStream == null) {
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .build();
+                }
                 return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .build();
+                        .status(HttpStatus.OK)
+                        .body(entryListParser.parse(inputStream));
+            } finally {
+                if (httpcon != null) {
+                    httpcon.disconnect();
+                }
             }
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(entryListParser.parse(inputStream));
         } catch (final IOException e) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
